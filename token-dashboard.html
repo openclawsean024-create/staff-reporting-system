@@ -18,6 +18,7 @@
             --accent-green: #10b981;
             --accent-orange: #f97316;
             --accent-pink: #ec4899;
+            --accent-blue: #3b82f6;
             --border: #2a2a3a;
         }
 
@@ -44,9 +45,17 @@
         }
 
         header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 48px;
             animation: fadeInDown 0.6s ease-out;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-left {
+            text-align: left;
         }
 
         h1 {
@@ -62,6 +71,38 @@
         .subtitle {
             color: var(--text-secondary);
             font-size: 1rem;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .time-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .time-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .time-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
         }
 
         .stats-grid {
@@ -159,6 +200,109 @@
             font-weight: 500;
             margin-bottom: 16px;
             color: var(--text-secondary);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .model-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .model-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .model-badge.primary {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+
+        .model-badge.secondary {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .model-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .model-stat {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .model-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .model-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .model-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .model-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .model-bar-fill.cyan {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+        }
+
+        .model-bar-fill.purple {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
         }
 
         .files-table {
@@ -351,14 +495,24 @@
             .container { padding: 24px 16px; }
             .stats-grid { grid-template-columns: 1fr; }
             .cron-grid { grid-template-columns: 1fr; }
+            header { flex-direction: column; text-align: center; }
+            .header-left { text-align: center; }
+            .time-selector { justify-content: center; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📊 Token 使用量儀表板</h1>
-            <p class="subtitle">MiniMax-M2.5 · 最後更新：2026-03-04 20:00 (Asia/Taipei)</p>
+            <div class="header-left">
+                <h1>📊 Token 使用量儀表板</h1>
+                <p class="subtitle">最後更新：2026-03-04 20:00 (Asia/Taipei)</p>
+            </div>
+            <div class="time-selector">
+                <button class="time-btn" onclick="switchTimeRange('week')">週</button>
+                <button class="time-btn active" onclick="switchTimeRange('month')">月</button>
+                <button class="time-btn" onclick="switchTimeRange('year')">年</button>
+            </div>
         </header>
 
         <!-- 主要數據 -->
@@ -385,10 +539,58 @@
             </div>
         </div>
 
+        <!-- 模型消耗 -->
+        <div class="section">
+            <h2 class="section-title">🤖 語言模型 Token 消耗</h2>
+            <div class="model-grid">
+                <div class="model-card">
+                    <div class="model-header">
+                        <span class="model-name">🧠 MiniMax M2.5</span>
+                        <span class="model-badge primary">主要模型</span>
+                    </div>
+                    <div class="model-stats">
+                        <div class="model-stat">
+                            <div class="model-stat-value">2.1M</div>
+                            <div class="model-stat-label">本月輸入</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-stat-value">180K</div>
+                            <div class="model-stat-label">本月輸出</div>
+                        </div>
+                    </div>
+                    <div class="model-bar">
+                        <div class="model-bar-fill cyan" style="width: 95%"></div>
+                    </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-header">
+                        <span class="model-name">📦 MiniMax M2.1</span>
+                        <span class="model-badge secondary">備用</span>
+                    </div>
+                    <div class="model-stats">
+                        <div class="model-stat">
+                            <div class="model-stat-value">105K</div>
+                            <div class="model-stat-label">本月輸入</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-stat-value">8K</div>
+                            <div class="model-stat-label">本月輸出</div>
+                        </div>
+                    </div>
+                    <div class="model-bar">
+                        <div class="model-bar-fill purple" style="width: 5%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 圖表區域 -->
         <div class="section">
-            <h2 class="section-title">📈 每日使用趨勢 (過去 5 天)</h2>
+            <h2 class="section-title">📈 使用趨勢</h2>
             <div class="chart-container">
+                <div class="chart-header">
+                    <span class="chart-title">📊 Token 消耗趨勢</span>
+                </div>
                 <canvas id="dailyChart" height="100"></canvas>
             </div>
         </div>
@@ -399,7 +601,7 @@
             <div class="cron-grid">
                 <div class="cron-card">
                     <div class="cron-name">
-                        � hourly-check
+                        ⏰ hourly-check
                         <span class="cron-badge">每小時</span>
                     </div>
                     <div class="cron-stats">
@@ -584,47 +786,99 @@
     </div>
 
     <script>
-        // 每日使用趨勢圖
-        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
-        new Chart(dailyCtx, {
-            type: 'bar',
-            data: {
-                labels: ['03-02', '03-03', '03-04', '03-05', '03-06'],
-                datasets: [{
-                    label: 'Input Tokens (k)',
-                    data: [352, 392, 704, 0, 0],
-                    backgroundColor: 'rgba(0, 212, 255, 0.8)',
-                    borderRadius: 8,
-                }, {
-                    label: 'Output Tokens (k)',
-                    data: [14, 15, 15, 0, 0],
-                    backgroundColor: 'rgba(168, 85, 247, 0.8)',
-                    borderRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#8888a0',
-                            font: { family: 'Noto Sans TC' }
+        // 模擬數據 - 週
+        const weekData = {
+            labels: ['03-01', '03-02', '03-03', '03-04'],
+            input: [180, 352, 392, 704],
+            output: [12, 14, 15, 15]
+        };
+
+        // 模擬數據 - 月
+        const monthData = {
+            labels: ['W1', 'W2', 'W3', 'W4'],
+            input: [1200, 1850, 2100, 2800],
+            output: [80, 120, 150, 180]
+        };
+
+        // 模擬數據 - 年
+        const yearData = {
+            labels: ['1月', '2月', '3月'],
+            input: [3500, 4200, 7950],
+            output: [250, 320, 530]
+        };
+
+        let currentChart = null;
+
+        function switchTimeRange(range) {
+            // 更新按鈕狀態
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新圖表
+            let data;
+            if (range === 'week') {
+                data = weekData;
+            } else if (range === 'month') {
+                data = monthData;
+            } else {
+                data = yearData;
+            }
+
+            updateChart(data, range);
+        }
+
+        function updateChart(data, range) {
+            const ctx = document.getElementById('dailyChart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Input Tokens (k)',
+                        data: data.input,
+                        backgroundColor: 'rgba(0, 212, 255, 0.8)',
+                        borderRadius: 8,
+                    }, {
+                        label: 'Output Tokens (k)',
+                        data: data.output,
+                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#8888a0',
+                                font: { family: 'Noto Sans TC' }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#2a2a3a' },
+                            ticks: { color: '#8888a0' }
+                        },
+                        y: {
+                            grid: { color: '#2a2a3a' },
+                            ticks: { color: '#8888a0' }
                         }
                     }
-                },
-                scales: {
-                    x: {
-                        grid: { color: '#2a2a3a' },
-                        ticks: { color: '#8888a0' }
-                    },
-                    y: {
-                        grid: { color: '#2a2a3a' },
-                        ticks: { color: '#8888a0' }
-                    }
                 }
-            }
-        });
+            });
+        }
+
+        // 初始載入月數據
+        updateChart(monthData, 'month');
     </script>
 </body>
 </html>
