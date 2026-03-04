@@ -461,6 +461,38 @@
             color: var(--accent-green);
         }
 
+        .optimize-btn {
+            padding: 8px 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-left: 16px;
+        }
+
+        .optimize-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+        }
+
+        .optimize-btn:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .optimize-btn.completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+
         footer {
             text-align: center;
             padding: 40px;
@@ -744,6 +776,7 @@
         <!-- 優化建議 -->
         <div class="section">
             <h2 class="section-title">🎯 優化建議</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">點擊「進行優化」按鈕，我會詢問確認後才會執行</p>
             <div class="optimize-list">
                 <div class="optimize-item">
                     <div class="optimize-info">
@@ -752,6 +785,7 @@
                     </div>
                     <div class="optimize-savings">~200k/天</div>
                     <span class="optimize-priority priority-high">高</span>
+                    <button class="optimize-btn" onclick="requestOptimize('skill-scan-weekly')">進行優化</button>
                 </div>
                 <div class="optimize-item">
                     <div class="optimize-info">
@@ -760,6 +794,7 @@
                     </div>
                     <div class="optimize-savings">~65k/天</div>
                     <span class="optimize-priority priority-high">高</span>
+                    <button class="optimize-btn" onclick="requestOptimize('hourly-2hours')">進行優化</button>
                 </div>
                 <div class="optimize-item">
                     <div class="optimize-info">
@@ -768,6 +803,7 @@
                     </div>
                     <div class="optimize-savings">~500/次</div>
                     <span class="optimize-priority priority-medium">中</span>
+                    <button class="optimize-btn" onclick="requestOptimize('simplify-agents')">進行優化</button>
                 </div>
                 <div class="optimize-item">
                     <div class="optimize-info">
@@ -776,6 +812,7 @@
                     </div>
                     <div class="optimize-savings">~375/次</div>
                     <span class="optimize-priority priority-low">低</span>
+                    <button class="optimize-btn" onclick="requestOptimize('remove-bootstrap')">進行優化</button>
                 </div>
             </div>
         </div>
@@ -879,6 +916,39 @@
 
         // 初始載入月數據
         updateChart(monthData, 'month');
+
+        // 優化請求處理
+        const optimizeDescriptions = {
+            'skill-scan-weekly': '將 daily-skill-scan 從每日改為每週執行',
+            'hourly-2hours': '將 project-hourly-check 從每小時改為每 2 小時執行',
+            'simplify-agents': '精簡 AGENTS.md 檔案內容',
+            'remove-bootstrap': '刪除 BOOTSTRAP.md 檔案'
+        };
+
+        function requestOptimize(action) {
+            const description = optimizeDescriptions[action];
+            const btn = event.target;
+            
+            if (btn.classList.contains('completed')) {
+                return;
+            }
+
+            // 顯示確認訊息
+            const confirmed = confirm('即將執行：' + description + '\n\n確定要繼續嗎？');
+            
+            if (confirmed) {
+                // 標記按鈕為處理中
+                btn.textContent = '處理中...';
+                btn.disabled = true;
+                
+                // 這裡會發送訊息給 AI 助理（也就是我！）
+                // 由於是靜態頁面，請直接回覆「確認執行 [action]」來讓我幫你執行
+                alert('✅ 已收到您的確認！\n\n請回覆我「確認執行」+ 優化項目代碼：\n\n• 確認執行 skill-scan-weekly\n• 確認執行 hourly-2hours\n• 確認執行 simplify-agents\n• 確認執行 remove-bootstrap\n\n例如：確認執行 skill-scan-weekly');
+                
+                btn.textContent = '✅ 已確認';
+                btn.classList.add('completed');
+            }
+        }
     </script>
 </body>
 </html>
