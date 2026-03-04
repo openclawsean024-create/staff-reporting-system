@@ -1,209 +1,589 @@
-# 📑 專案戰情室 (Project Management Dashboard)
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Dashboard | OpenClaw</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #1d1d1f;
+            --bg-tertiary: #2d2d2f;
+            --bg-card: #1c1c1e;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --text-tertiary: #6e6e73;
+            --accent-blue: #2997ff;
+            --accent-purple: #bf5af2;
+            --accent-green: #30d158;
+            --accent-orange: #ff9f0a;
+            --accent-red: #ff453a;
+            --accent-pink: #ff375f;
+            --border: rgba(255,255,255,0.1);
+            --gradient-blue: linear-gradient(135deg, #2997ff 0%, #5e5ce6 100%);
+        }
 
-> 最後更新：2026-03-04 20:49 (Asia/Taipei)
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
----
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
 
-## 1. 專案狀態總覽 (Current Status)
+        /* Background Effects */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(41, 151, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 60%, rgba(190, 90, 242, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
 
-| 項目 | 數值 |
-|------|------|
-| **專案名稱** | OpenClaw Workspace |
-| **當前進度** | ████████████░░░░░░░░░ 60% |
-| **核心模型** | MiniMax-M2.5 (主要) / MiniMax-M2.1 (備用) |
-| **最後活躍時間** | 2026-03-04 20:49 |
-| **Context 使用** | 102k / 200k (51%) |
-| **今日總 Tokens** | ~726k 輸入 / 2.8k 輸出 |
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px 100px;
+        }
 
-### 📊 戰情室指標
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.8s ease-out;
+        }
 
-| 指標 | 數值 | 狀態 |
-|------|------|------|
-| 專案總數 | 24 個目錄 | 🟢 |
-| 已上線網站 | 9 個 | 🟢 |
-| 已安裝 Skills | 52+ 個 | 🟢 |
-| Context 檔案 | 82 個 .md | 🟡 中等 |
-| 每日 Cron Jobs | 7 個 | 🟡 需優化 |
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
 
----
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+        }
 
-## 2. 功能開發路徑 (Feature Roadmap)
+        h1 {
+            font-size: 48px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-### ✅ 已實作功能 (Completed)
+        .subtitle {
+            font-size: 21px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
 
-| 功能 | 說明 | 狀態 |
-|------|------|------|
-| **文字轉語音 MVP** | 文字轉語音服務，v1.1 (5000字限制/進度條/歷史記錄) | ✅ 上線 |
-| **有聲書轉換器** | 電子書轉有聲書，v3.9 | ✅ 上線 |
-| **名片王系統** | 名片管理系統 (Vercel 部署) | ✅ 上線 |
-| **駐點人員回報系統** | 人員報到管理系統 | ✅ 上線 |
-| **Trade 回測系統** | 交易策略回測工具 | ✅ 上線 |
-| **會議記錄系統** | 會議錄音與筆記系統 | ✅ 上線 |
-| **市場調查工具** | 市場研究資料收集 | ✅ 上線 |
-| **AI 簡報產生器** | AI 驅動簡報生成 | ✅ 上線 |
-| **SUI 區塊鏈部落格** | 區塊鏈部落格系統 | ✅ 上線 |
-| **YouTube 趨勢收集器** | 每日 YouTube 趨勢數據收集 | ✅ 運作中 |
-| **OpenClaw 新聞收集器** | 自動化新聞監控 | ✅ 運作中 |
-| **泡腳追蹤系統** | 每日健康習慣追蹤 | ✅ 運作中 |
-| **Token 儀表板** | Token 使用量視覺化 | ✅ 新增 |
-| **專案戰情室** | 專案管理儀表板 | ✅ 新增 |
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 48px;
+        }
 
-### 🚧 當前開發中 (In Progress)
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
 
-| 項目 | 描述 | 進度 |
-|------|------|------|
-| **MP3 下載功能** | 文字轉語音 MVP 的下載功能 | 🔧 籌備中 (需後端) |
-| **名片匯入功能** | 名片王的 CSV/QRCode 匯入 | 📋 規劃中 |
-| **更多音色選項** | 有聲書轉換器的聲音選擇 | 📋 規劃中 |
-| **MiniMax API 整合** | 整合 MiniMax 圖片/影片生成 API | 🔄 研究中 |
-| **Google Drive 上傳** | 雲端備份與同步功能 | 🔄 研究中 |
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.25s; }
 
-### 🚀 預計新增功能 (Roadmap)
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
 
-| 功能 | 拆分步驟 | 優先級 |
-|------|---------|--------|
-| **自動化測試框架** | 1. 建立 Playwright 測試腳本<br>2. 整合 CI/CD 流程<br>3. 撰寫單元測試 | 🟡 中 |
-| **數據分析儀表板** | 1. 設計儀表板 UI<br>2. 串接數據源<br>3. 建立視覺化圖表 | 🟡 中 |
-| **多語言支援** | 1. i18n 架構建立<br>2. 翻譯檔案製作<br>3. 語言切換器 | 🟢 低 |
-| **Stripe 支付整合** | 1. Stripe API 技能安裝<br>2. 測試支付流程<br>3. 商家帳號設定 | 🟢 低 |
-| **LINE Bot 整合** | 1. LINE Developer 帳號<br>2. Webhook 設定<br>3. 訊息回覆邏輯 | 🟢 低 |
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
----
+        .stat-value {
+            font-size: 36px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
 
-## 3. 系統 Context 目錄 (Context Inventory)
+        .stat-value.blue { color: var(--accent-blue); }
+        .stat-value.purple { color: var(--accent-purple); }
+        .stat-value.green { color: var(--accent-green); }
+        .stat-value.orange { color: var(--accent-orange); }
 
-### 📁 核心檔案 (每次載入)
+        .stat-detail {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
 
-| 檔案路徑 | 大小 (Bytes) | 預估 Tokens | 功能描述 |
-|----------|--------------|-------------|---------|
-| `AGENTS.md` | 7,869 | ~2,000 | AI 行為規範與工作流程 |
-| `SOUL.md` | 1,673 | ~425 | AI 人格與特質定義 |
-| `USER.md` | 477 | ~125 | 使用者資訊與偏好 |
-| `TOOLS.md` | 860 | ~225 | 本地工具與設定 |
-| `IDENTITY.md` | 636 | ~150 | AI 身份認同 |
-| `HEARTBEAT.md` | 68 | ~17 | 心跳檢查清單 |
-| `BOOTSTRAP.md` | 1,470 | ~375 | 初始化腳本 (可移除) |
-| **小計** | **13,053** | **~3,317** | |
+        /* Section */
+        .section {
+            margin-bottom: 48px;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
 
-### 📂 Memory 目錄 (按需載入)
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
 
-| 檔案路徑 | 大小 | 預估 Tokens | 功能描述 |
-|----------|------|-------------|---------|
-| `memory/2026-03-04.md` | 471 B | ~120 | 今日待辦事項 |
-| `memory/2026-03-03.md` | 3,575 B | ~900 | 昨日開發日誌 |
-| `memory/2026-03-02.md` | 1,534 B | ~375 | 前日記錄 |
-| `memory/2026-03-01.md` | 1,760 B | ~450 | 本週初記錄 |
-| `memory/market-research.md` | 963 B | ~240 | 市場研究資料 |
-| **小計** | **8,303** | **~2,085** | |
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
 
-### 📂 Skills 目錄 (按需載入)
+        .section-badge {
+            font-size: 12px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            color: var(--text-secondary);
+        }
 
-| 檔案路徑 | 大小 | 預估 Tokens | 功能描述 |
-|----------|------|-------------|---------|
-| `skills/stripe/skill.md` | 26,085 | ~6,500 | Stripe 支付整合 |
-| `skills/afrexai-presentation-mastery/SKILL.md` | 22,233 | ~5,500 | 簡報大師技能 |
-| `skills/prezentit/SKILL.md` | 21,918 | ~5,500 | Prezentit 簡報 |
-| `skills/agentmail/references/EXAMPLES.md` | 14,140 | ~3,500 | Email API範例 |
-| `skills/clawscan/SKILL.md` | 14,342 | ~3,500 | 安全掃描技能 |
-| `skills/skill-vetting/ARCHITECTURE.md` | 11,065 | ~2,750 | 技能審核架構 |
-| `skills/google-slides/SKILL.md` | 12,954 | ~3,250 | Google Slides 整合 |
-| `skills/soul-guardian/README.md` | 8,133 | ~2,025 | 檔案完整性監控 |
-| **Top 8 小計** | **130,870** | **~32,525** | |
-| **其他 Skills** | ~100,000 | ~25,000 | 其他 44+ 技能 |
-| **Skills 總計** | ~230,000 | ~57,500 | |
+        /* Feature Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
 
-### 📂 專案目錄 (不載入 Context)
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
 
-| 目錄 | 主要檔案 | 說明 |
-|------|---------|------|
-| `text-to-speech-mvp/` | - | 文字轉語音服務 |
-| `ebook-to-audiobook/` | PROJECT.md | 有聲書轉換器 |
-| `business-card-manager/` | SETUP.md | 名片管理系統 |
-| `sui-blog/` | README.md | 區塊鏈部落格 |
-| `youtube-trending-collector/` | README.md | YouTube 趨勢收集 |
-| `openclaw-news-collector/` | README.md | 新聞收集器 |
-| `automation/` | 24-7-system.md | 自動化腳本 |
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.15);
+        }
 
----
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
 
-## 4. 運行成本紀錄 (Execution Log)
+        .feature-icon.blue { background: rgba(41, 151, 255, 0.15); }
+        .feature-icon.purple { background: rgba(190, 90, 242, 0.15); }
+        .feature-icon.green { background: rgba(48, 209, 88, 0.15); }
+        .feature-icon.orange { background: rgba(255, 159, 10, 0.15); }
+        .feature-icon.pink { background: rgba(255, 55, 95, 0.15); }
 
-### 過去 5 天每日活動量
+        .feature-name {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
 
-| 日期 | LLM 模型 | 活動描述 | 預估消耗 (k Tokens) |
-|------|----------|---------|-------------------|
-| 2026-03-04 | MiniMax-M2.5 | 主會話互動 + Cron Jobs | ~726k (當前累積) |
-| 2026-03-04 | MiniMax-M2.5 | project-hourly-check (10次) | ~150k |
-| 2026-03-04 | MiniMax-M2.5 | daily-skill-scan (06:00) | ~36k |
-| 2026-03-04 | MiniMax-M2.5 | daily-project-summary (09:00) | ~6.6k |
-| 2026-03-04 | MiniMax-M2.5 | daily-update (05:00) | ~1.4k |
-| 2026-03-03 | MiniMax-M2.5 | 主會話互動 (推估) | ~80k |
-| 2026-03-03 | MiniMax-M2.5 | project-hourly-check | ~106k |
-| 2026-03-03 | MiniMax-M2.5 | daily-skill-scan | ~30k |
-| 2026-03-03 | MiniMax-M2.5 | daily-project-summary | ~10k |
-| 2026-03-02 | MiniMax-M2.5 | 主會話互動 (推估) | ~80k |
-| 2026-03-02 | MiniMax-M2.5 | project-hourly-check | ~95k |
-| 2026-03-02 | MiniMax-M2.5 | daily-skill-scan | ~31k |
-| 2026-03-01 | MiniMax-M2.5 | 主會話互動 (推估) | ~80k |
-| 2026-03-01 | MiniMax-M2.5 | Cron Jobs (推估) | ~120k |
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
 
-### 📈 月度彙總
+        .feature-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
 
-| 月份 | 輸入 Tokens | 輸出 Tokens | 總計 |
-|------|------------|------------|------|
-| 2026-03 (截至今日) | ~1,400k | ~100k | ~1,500k |
-| 2026-02 (推估) | ~3,500k | ~250k | ~3,750k |
-| 2026-01 (推估) | ~3,000k | ~200k | ~3,200k |
+        .status-live {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--accent-green);
+        }
 
----
+        .status-progress {
+            background: rgba(41, 151, 255, 0.15);
+            color: var(--accent-blue);
+        }
 
-## 5. 自動化任務排程 (Cron Jobs)
+        .status-planned {
+            background: rgba(142, 142, 147, 0.15);
+            color: var(--text-secondary);
+        }
 
-| Job Name | 排程 | 狀態 | 預估消耗 |
-|----------|------|------|---------|
-| `project-hourly-check` | 每小時 | 🟢 運作中 | ~130k/天 |
-| `youtube-daily-trending` | 每日 20:00 | 🟢 運作中 | ~5k/天 |
-| `泡腳-天數成效Agent` | 每日 23:00 | 🟢 運作中 | ~3k/天 |
-| `daily-update` | 每日 05:00 | 🟢 運作中 | ~1k/天 |
-| `daily-skill-scan` | 每日 06:00 | 🟡 需優化 | ~32k/天 |
-| `daily-project-summary` | 每日 09:00 | 🟢 運作中 | ~8k/天 |
-| `openclaw-daily-news` | 每日 09:00 | 🔴 錯誤 | - |
+        /* Progress Bar */
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
 
----
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
 
-## 6. 待處理事項 (Action Items)
+        .progress-fill.blue { background: var(--accent-blue); }
+        .progress-fill.green { background: var(--accent-green); }
+        .progress-fill.purple { background: var(--accent-purple); }
 
-### 🔴 高優先級
+        /* Chart */
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid var(--border);
+        }
 
-- [ ] **確認執行** daily-skill-scan 改為每週一次 (可省 ~200k/天)
-- [ ] **確認執行** project-hourly-check 改為每 2 小時 (可省 ~65k/天)
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
 
-### 🟡 中優先級
+        .chart-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
 
-- [ ] 精簡 AGENTS.md 減少 Context 載入
-- [ ] 修復 openclaw-daily-news Cron Job 錯誤
+        .chart-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 10px;
+        }
 
-### 🟢 低優先級
+        .chart-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
 
-- [ ] 移除 BOOTSTRAP.md (已完成初始化)
-- [ ] 建立 Stripe 支付測試環境
-- [ ] 開發 MP3 下載功能
+        .chart-tab.active {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
 
----
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
 
-## 📋 變更記錄 (Changelog)
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
 
-| 日期 | 變更內容 |
-|------|---------|
-| 2026-03-04 | 新增 Token 儀表板 |
-| 2026-03-04 | 新增泡腳追蹤系統 |
-| 2026-03-04 | 建立專案戰情室 |
-| 2026-03-03 | 會議記錄系統上線 |
-| 2026-03-03 | 市場調查工具上線 |
-| 2026-03-03 | AI 簡報產生器上線 |
-| 2026-03-03 | SUI 部落格系統上線 |
-| 2026-03-02 | TTS MVP v1.1 更新 |
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
----
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .feature-grid { grid-template-columns: repeat(2, 1fr); }
+        }
 
-*此戰情室由 OpenClaw 自動維護*
+        @media (max-width: 640px) {
+            h1 { font-size: 36px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .container { padding: 40px 16px 80px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">P</div>
+            </div>
+            <h1>Project Dashboard</h1>
+            <p class="subtitle">OpenClaw Workspace · 專案戰情室</p>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Projects</div>
+                <div class="stat-value blue">24</div>
+                <div class="stat-detail">Total repositories</div>
+                <div class="progress-bar"><div class="progress-fill blue" style="width: 80%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Live Sites</div>
+                <div class="stat-value green">9+</div>
+                <div class="stat-detail">Deployed on Vercel</div>
+                <div class="progress-bar"><div class="progress-fill green" style="width: 75%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Context</div>
+                <div class="stat-value purple">51%</div>
+                <div class="stat-detail">102k / 200k tokens</div>
+                <div class="progress-bar"><div class="progress-fill purple" style="width: 51%"></div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Daily Usage</div>
+                <div class="stat-value orange">~300k</div>
+                <div class="stat-detail">Tokens per day</div>
+                <div class="progress-bar"><div class="progress-fill blue" style="width: 60%"></div></div>
+            </div>
+        </div>
+
+        <!-- Live Projects -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🚀 Live Projects</h2>
+                <span class="section-badge">9 Deployed</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon blue">🎙</div>
+                    <div class="feature-name">文字轉語音 MVP</div>
+                    <div class="feature-desc">Text-to-speech service with progress tracking</div>
+                    <span class="feature-status status-live">● Live v1.1</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">📚</div>
+                    <div class="feature-name">有聲書轉換器</div>
+                    <div class="feature-desc">Ebook to audiobook converter</div>
+                    <span class="feature-status status-live">● Live v3.9</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">💳</div>
+                    <div class="feature-name">名片王</div>
+                    <div class="feature-desc">Business card management system</div>
+                    <span class="feature-status status-live">● Live</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon orange">📋</div>
+                    <div class="feature-name">駐點人員系統</div>
+                    <div class="feature-desc">Staff reporting & check-in system</div>
+                    <span class="feature-status status-live">● Live</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon pink">📊</div>
+                    <div class="feature-name">Trade 回測系統</div>
+                    <div class="feature-desc">Trading strategy backtest tool</div>
+                    <span class="feature-status status-live">● Live</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon blue">🎥</div>
+                    <div class="feature-name">YouTube 趨勢收集</div>
+                    <div class="feature-desc">Daily trending data collection</div>
+                    <span class="feature-status status-live">● Live</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🚧 In Progress</h2>
+                <span class="section-badge">5 Active</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon blue">⬇️</div>
+                    <div class="feature-name">MP3 下載功能</div>
+                    <div class="feature-desc">Download functionality for TTS</div>
+                    <span class="feature-status status-progress">◐ Planning</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">📥</div>
+                    <div class="feature-name">名片匯入功能</div>
+                    <div class="feature-desc">CSV/QRCode import for cards</div>
+                    <span class="feature-status status-progress">◐ Planning</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon green">🎨</div>
+                    <div class="feature-name">MiniMax API 整合</div>
+                    <div class="feature-desc">Image & video generation API</div>
+                    <span class="feature-status status-progress">◐ Researching</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Chart -->
+        <div class="section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">📈 Token Usage Trend</h3>
+                    <div class="chart-tabs">
+                        <button class="chart-tab" onclick="switchChart('week')">Week</button>
+                        <button class="chart-tab active" onclick="switchChart('month')">Month</button>
+                        <button class="chart-tab" onclick="switchChart('year')">Year</button>
+                    </div>
+                </div>
+                <canvas id="usageChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Upcoming -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Roadmap</h2>
+                <span class="section-badge">5 Planned</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon purple">🧪</div>
+                    <div class="feature-name">自動化測試框架</div>
+                    <div class="feature-desc">Playwright + CI/CD integration</div>
+                    <span class="feature-status status-planned">○ Planned</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon blue">📊</div>
+                    <div class="feature-name">數據分析儀表板</div>
+                    <div class="feature-desc">Analytics dashboard with visualizations</div>
+                    <span class="feature-status status-planned">○ Planned</span>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon orange">🌐</div>
+                    <div class="feature-name">多語言支援</div>
+                    <div class="feature-desc">i18n architecture support</div>
+                    <span class="feature-status status-planned">○ Planned</span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-logo">
+                <span>🔧 OpenClaw Project Dashboard</span>
+            </div>
+            <p>Last updated: 2026-03-04 · Powered by MiniMax M2.5</p>
+        </footer>
+    </div>
+
+    <script>
+        // Chart Configuration
+        const weekData = { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], input: [180, 352, 392, 400, 380, 200, 150] };
+        const monthData = { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], input: [1200, 1850, 2100, 2800] };
+        const yearData = { labels: ['Jan', 'Feb', 'Mar'], input: [3500, 4200, 7950] };
+
+        let currentChart = null;
+
+        function switchChart(range) {
+            document.querySelectorAll('.chart-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let data = range === 'week' ? weekData : range === 'month' ? monthData : yearData;
+            updateChart(data);
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            if (currentChart) currentChart.destroy();
+            
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Input Tokens (k)',
+                        data: data.input,
+                        backgroundColor: 'rgba(41, 151, 255, 0.8)',
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#86868b', font: { family: 'Inter' } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#86868b', font: { family: 'Inter' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        updateChart(monthData);
+    </script>
+</body>
+</html>
