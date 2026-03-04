@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenClaw 全面介紹</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Noto Sans TC',sans-serif;background:#0a0a0a;color:#fff;overflow:hidden;height:100vh}
+        .slide-container{width:100vw;height:100vh;position:relative}
+        .slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;padding:35px 50px;background:linear-gradient(145deg,#0d1117,#161b22);opacity:0;transition:opacity 0.6s}
+        .slide.active{display:flex;flex-direction:column;opacity:1}
+        .progress-bar{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#58a6ff,#a371f7,#f778ba);z-index:1000}
+        .slide-number{position:absolute;bottom:15px;right:25px;font-size:11px;color:rgba(255,255,255,0.2)}
+        .slide-title{justify-content:center;align-items:center;text-align:center;background:radial-gradient(ellipse at center,#1a1f2e,#0d1117)}
+        .slide-title h1{font-size:3.5em;font-weight:900;margin-bottom:18px;background:linear-gradient(135deg,#58a6ff,#a371f7,#f778ba);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .slide-title .subtitle{font-size:1.3em;color:#8b949e;margin-bottom:30px}
+        .product-tags{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:25px}
+        .product-tag{background:rgba(88,166,255,0.15);border:1px solid rgba(88,166,255,0.3);padding:8px 16px;border-radius:20px;font-size:12px}
+        .section-header{font-size:10px;color:#ffa657;text-transform:uppercase;letter-spacing:3px;margin-bottom:8px}
+        .slide h2{font-size:1.8em;font-weight:700;margin-bottom:20px}
+        .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1}
+        .content-grid-3{grid-template-columns:repeat(3,1fr)}
+        .content-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px}
+        .content-box h3{font-size:1em;color:#58a6ff;margin-bottom:12px;font-weight:600}
+        .content-box ul{list-style:none;padding:0}
+        .content-box li{padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);color:#c9d1d9;line-height:1.5;font-size:13px;padding-left:15px;position:relative}
+        .content-box li:last-child{border-bottom:none}
+        .content-box li::before{content:'';position:absolute;left:0;top:12px;width:4px;height:4px;background:#58a6ff;border-radius:50%}
+        .highlight-box{background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.2);padding:16px;border-radius:12px;margin:14px 0}
+        .highlight-box strong{color:#58a6ff}
+        .quote-box{background:rgba(163,113,247,0.08);border-left:3px solid #a371f7;padding:14px;border-radius:0 12px 12px 0;margin:12px 0;font-style:italic;color:#c9d1d9}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:14px 0}
+        .stat-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;text-align:center}
+        .stat-number{font-size:2.2em;font-weight:900;background:linear-gradient(135deg,#58a6ff,#a371f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-label{color:#8b949e;margin-top:6px;font-size:11px}
+        .problem-solution{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+        .problem{background:rgba(255,77,77,0.08);border:1px solid rgba(255,77,77,0.2);border-radius:14px;padding:18px}
+        .problem h4{color:#ff6b6b;margin-bottom:12px;font-size:1em}
+        .solution{background:rgba(72,199,115,0.08);border:1px solid rgba(72,199,115,0.2);border-radius:14px;padding:18px}
+        .solution h4{color:#48c774;margin-bottom:12px;font-size:1em}
+        .timeline{display:flex;justify-content:space-between;margin:24px 0;position:relative}
+        .timeline::before{content:'';position:absolute;top:22px;left:8%;right:8%;height:2px;background:linear-gradient(90deg,#58a6ff,#a371f7,#f778ba)}
+        .timeline-item{flex:1;text-align:center;position:relative;z-index:1}
+        .timeline-day{background:linear-gradient(145deg,#58a6ff,#a371f7);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-weight:700;font-size:14px}
+        .timeline-text{color:#8b949e;font-size:11px;line-height:1.4}
+        .chart-container{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;margin:14px 0}
+        .chart-title{font-size:0.9em;color:#8b949e;margin-bottom:14px;text-align:center}
+        .bar-chart{display:flex;flex-direction:column;gap:8px}
+        .bar-item{display:flex;align-items:center;gap:8px}
+        .bar-label{width:80px;font-size:10px;color:#8b949e;text-align:right}
+        .bar-track{flex:1;height:18px;background:rgba(255,255,255,0.05);border-radius:9px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:9px;background:linear-gradient(90deg,#58a6ff,#a371f7);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:9px;font-weight:600}
+        .conclusion{text-align:center;justify-content:center;align-items:center}
+        .conclusion blockquote{font-size:1.6em;color:#fff;max-width:750px;line-height:1.6;font-weight:300}
+        .conclusion cite{display:block;margin-top:30px;color:#8b949e}
+        .nav{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:1000}
+        .nav button{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit;transition:0.3s}
+        .nav button:hover{background:rgba(88,166,255,0.2)}
+        .feature-icon{font-size:2em;margin-bottom:8px}
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress" style="width:7%"></div>
+    <div class="slide-container">
+        <!-- Slide 1: Title -->
+        <div class="slide slide-title active">
+            <h1>OpenClaw</h1>
+            <p class="subtitle">AI 個人助理的全新可能</p>
+            <p style="color:#6e7681;font-size:1em;">你的專屬 AI 助手，跨越所有平台</p>
+            <div class="product-tags">
+                <span class="product-tag">🤖 AI Assistant</span>
+                <span class="product-tag">💬 Multi-Platform</span>
+                <span class="product-tag">🔗 Cross-Platform</span>
+                <span class="product-tag">⚡ Automation</span>
+            </div>
+            <div class="slide-number">01 / 12</div>
+        </div>
+        
+        <!-- Slide 2: What is OpenClaw -->
+        <div class="slide">
+            <span class="section-header">認識 OpenClaw</span>
+            <h2>什麼是 OpenClaw？</h2>
+            <div class="content-grid">
+                <div class="content-box"><h3>核心理念</h3><ul><li>開源 AI 個人助理框架</li><li>支援多平台、多訊息源</li><li>本地部署，隱私優先</li><li>高度可擴充的技能系統</li></ul></div>
+                <div class="content-box"><h3>核心能力</h3><ul><li>跨平台訊息整合（Telegram、Discord 等）</li><li>AI 對話與任務執行</li><li>自動化工作流程</li><li>技能市場（Skills Marketplace）</li></ul></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">50+</div><div class="stat-label">內建技能</div></div>
+                <div class="stat-card"><div class="stat-number">10+</div><div class="stat-label">支援平台</div></div>
+                <div class="stat-card"><div class="stat-number">100%</div><div class="stat-label">開源免費</div></div>
+                <div class="stat-card"><div class="stat-number">🛡️</div><div class="stat-label">隱私優先</div></div>
+            </div>
+            <div class="slide-number">02 / 12</div>
+        </div>
+        
+        <!-- Slide 3: Core Features -->
+        <div class="slide">
+            <span class="section-header">核心功能</span>
+            <h2>OpenClaw 六大核心功能</h2>
+            <div class="content-grid-3" style="grid-template-columns:repeat(3,1fr)">
+                <div class="content-box"><div class="feature-icon">💬</div><h3>多平台訊息</h3><ul><li>Telegram</li><li>Discord</li><li>WhatsApp</li><li>Signal</li></ul></div>
+                <div class="content-box"><div class="feature-icon">🤖</div><h3>AI 對話</h3><ul><li>多模型支援</li><li>上下文理解</li><li>自訂提示詞</li><li>記憶系統</li></ul></div>
+                <div class="content-box"><div class="feature-icon">⚡</div><h3>自動化</h3><ul><li>Cron 排程</li><li>心跳檢查</li><li>工作流程</li><li>Webhook</li></ul></div>
+            </div>
+            <div class="content-grid" style="margin-top:15px">
+                <div class="content-box"><div class="feature-icon">🧩</div><h3>技能系統</h3><ul><li>Skills Marketplace</li><li>自由擴充</li><li>社區分享</li><li>一鍵安裝</li></ul></div>
+                <div class="content-box"><div class="feature-icon">🔒</div><h3>隱私安全</h3><ul><li>本地部署</li><li>端對端加密</li><li>自托管</li><li>資料自主</li></ul></div>
+            </div>
+            <div class="slide-number">03 / 12</div>
+        </div>
+        
+        <!-- Slide 4: Architecture -->
+        <div class="slide">
+            <span class="section-header">系統架構</span>
+            <h2>OpenClaw 系統架構</h2>
+            <div class="chart-container">
+                <div class="chart-title">系統層級架構圖</div>
+                <div class="bar-chart">
+                    <div class="bar-item"><span class="bar-label">應用層</span><div class="bar-track"><div class="bar-fill" style="width:90%">Web / CLI / Telegram / Discord</div></div></div>
+                    <div class="bar-item"><span class="bar-label">技能層</span><div class="bar-track"><div class="bar-fill" style="width:75%">50+ Skills / MCP Servers</div></div></div>
+                    <div class="bar-item"><span class="bar-label">核心層</span><div class="bar-track"><div class="bar-fill" style="width:60%">Gateway / Agent / Memory</div></div></div>
+                    <div class="bar-item"><span class="bar-label">平台層</span><div class="bar-track"><div class="bar-fill" style="width:45%">Telegram / Discord / Slack</div></div></div>
+                </div>
+            </div>
+            <div class="content-grid">
+                <div class="content-box"><h3>Gateway</h3><ul><li>訊息路由與轉發</li><li>認證與授權</li><li>平台連接管理</li></ul></div>
+                <div class="content-box"><h3>Agent</h3><ul><li>AI 模型調用</li><li>對話邏輯</li><li>工具調度</li></ul></div>
+            </div>
+            <div class="slide-number">04 / 12</div>
+        </div>
+        
+        <!-- Slide 5: Supported Platforms -->
+        <div class="slide">
+            <span class="section-header">支援平台</span>
+            <h2>跨平台支援</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="feature-icon">✈️</div><div class="stat-label">Telegram</div></div>
+                <div class="stat-card"><div class="feature-icon">🎮</div><div class="stat-label">Discord</div></div>
+                <div class="stat-card"><div class="feature-icon">💬</div><div class="stat-label">WhatsApp</div></div>
+                <div class="stat-card"><div class="feature-icon">🔔</div><div class="stat-label">Signal</div></div>
+                <div class="stat-card"><div class="feature-icon">📱</div><div class="stat-label">iMessage</div></div>
+                <div class="stat-card"><div class="feature-icon">💼</div><div class="stat-label">Slack</div></div>
+                <div class="stat-card"><div class="feature-icon">💌</div><div class="stat-label">Email</div></div>
+                <div class="stat-card"><div class="feature-icon">🌐</div><div class="stat-label">Web Chat</div></div>
+            </div>
+            <div class="highlight-box"><strong>統一入口：</strong>透過任何平台都能與你的 AI 助理互動，所有訊息同步、上下文共享</div>
+            <div class="slide-number">05 / 12</div>
+        </div>
+        
+        <!-- Slide 6: Skills System -->
+        <div class="slide">
+            <span class="section-header">技能系統</span>
+            <h2>Skills Marketplace</h2>
+            <div class="content-grid">
+                <div class="content-box"><h3>現有技能分類</h3><ul><li><strong>🎨 圖片生成：</strong>OpenAI, Google, MiniMax, DashScope</li><li><strong>🎬 影片生成：</strong>Veo, Seedance, Wan</li><li><strong>🔍 搜尋與研究：</strong>Web Search, Deep Research</li><li><strong>📊 生產力：</strong>Email, Calendar, Tasks</li><li><strong>🛠️ 開發工具：</strong>GitHub, Docker, Vercel</li></ul></div>
+                <div class="content-box"><h3>安裝與使用</h3><ul><li><strong>簡單安裝：</strong>clawhub install &lt;skill&gt;</li><li><strong>一鍵啟用：</strong>自動配置與授權</li><li><strong>安全掃描：</strong>安裝前風險評估</li><li><strong>社群分享：</strong>發布自己的技能</li></ul></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">50+</div><div class="stat-label">已安裝技能</div></div>
+                <div class="stat-card"><div class="stat-number">200+</div><div class="stat-label">可選技能</div></div>
+                <div class="stat-card"><div class="stat-number">🛡️</div><div class="stat-label">安全掃描</div></div>
+            </div>
+            <div class="slide-number">06 / 12</div>
+        </div>
+        
+        <!-- Slide 7: AI Models -->
+        <div class="slide">
+            <span class="section-header">AI 模型</span>
+            <h2>多模型支援</h2>
+            <div class="chart-container">
+                <div class="chart-title">支援的 AI 模型提供商</div>
+                <div class="bar-chart">
+                    <div class="bar-item"><span class="bar-label">OpenAI</span><div class="bar-track"><div class="bar-fill" style="width:95%;background:linear-gradient(90deg,#10a37f,#1a7f5a)">GPT-4, GPT-4o, o1, o3</div></div></div>
+                    <div class="bar-item"><span class="bar-label">Google</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:linear-gradient(90deg,#4285f4,#34a853)">Gemini 1.5/2.0, Veo, Imagen</div></div></div>
+                    <div class="bar-item"><span class="bar-label">Anthropic</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:linear-gradient(90deg,#d97757,#c96f4a)">Claude 3.5/3.7, Sonnet, Opus</div></div></div>
+                    <div class="bar-item"><span class="bar-label">MiniMax</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:linear-gradient(90deg,#00c7be,#009e8e)">M2, M2.1, M3</div></div></div>
+                    <div class="bar-item"><span class="bar-label">阿里雲</span><div class="bar-track"><div class="bar-fill" style="width:65%;background:linear-gradient(90deg,#ff6a00,#e55a00)">通義千問, 萬象</div></div></div>
+                </div>
+            </div>
+            <div class="highlight-box"><strong>靈活切換：</strong>根據任務需求，自動或手動切換最適合的 AI 模型</div>
+            <div class="slide-number">07 / 12</div>
+        </div>
+        
+        <!-- Slide 8: Use Cases -->
+        <div class="slide">
+            <span class="section-header">應用場景</span>
+            <h2>OpenClaw 可以做什麼？</h2>
+            <div class="content-grid-3" style="grid-template-columns:repeat(3,1fr)">
+                <div class="content-box"><div class="feature-icon">📧</div><h3>個人助理</h3><ul><li>郵件管理</li><li>日曆安排</li><li>任務提醒</li><li>待辦事項</li></ul></div>
+                <div class="content-box"><div class="feature-icon">🎨</div><h3>創意工具</h3><ul><li>AI 繪圖</li><li>影片生成</li><li>簡報製作</li><li>內容創作</li></ul></div>
+                <div class="content-box"><div class="feature-icon">💻</div><h3>開發者</h3><ul><li>程式碼管理</li><li>部署上線</li><li>API 整合</li><li>自動化測試</li></ul></div>
+            </div>
+            <div class="content-grid" style="margin-top:15px">
+                <div class="content-box"><div class="feature-icon">🔍</div><h3>研究與分析</h3><ul><li>網路搜尋</li><li>資料分析</li><li>報告生成</li><li>趨勢追蹤</li></ul></div>
+                <div class="content-box"><div class="feature-icon">🔔</div><h3>監控與警報</h3><ul><li>系統監控</li><li>安全警報</li><li>定時任務</li><li>異常通知</li></ul></div>
+            </div>
+            <div class="slide-number">08 / 12</div>
+        </div>
+        
+        <!-- Slide 9: Installation -->
+        <div class="slide">
+            <span class="section-header">安裝設定</span>
+            <h2>快速開始</h2>
+            <div class="chart-container">
+                <div class="chart-title">安裝步驟</div>
+                <div class="timeline">
+                    <div class="timeline-item"><div class="timeline-day">1</div><div class="timeline-text">安裝 OpenClaw<br>npm install -g openclaw</div></div>
+                    <div class="timeline-item"><div class="timeline-day">2</div><div class="timeline-text">初始化<br>openclaw init</div></div>
+                    <div class="timeline-item"><div class="timeline-day">3</div><div class="timeline-text">連接平台<br>設定 Token</div></div>
+                    <div class="timeline-item"><div class="timeline-day">4</div><div class="timeline-text">啟動使用<br>openclaw start</div></div>
+                </div>
+            </div>
+            <div class="content-grid">
+                <div class="content-box"><h3>系統需求</h3><ul><li>Node.js 18+</li><li>npm 或 yarn</li><li>4GB+ RAM</li><li>支援 Docker</li></ul></div>
+                <div class="content-box"><h3>部署選項</h3><ul><li>本地部署（開發者）</li><li>Docker Compose（伺服器）</li><li>雲端 VPS</li><li>Cloudflare Tunnel</li></ul></div>
+            </div>
+            <div class="slide-number">09 / 12</div>
+        </div>
+        
+        <!-- Slide 10: Community -->
+        <div class="slide">
+            <span class="section-header">社群與支援</span>
+            <h2>社群與生態</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="feature-icon">📖</div><div class="stat-label">文檔</div></div>
+                <div class="stat-card"><div class="feature-icon">💬</div><div class="stat-label">Discord</div></div>
+                <div class="stat-card"><div class="feature-icon">🐙</div><div class="stat-label">GitHub</div></div>
+                <div class="stat-card"><div class="feature-icon">🐦</div><div class="stat-label">Twitter</div></div>
+            </div>
+            <div class="content-grid">
+                <div class="content-box"><h3>資源與支援</h3><ul><li>官方文檔：docs.openclaw.ai</li><li>Discord 社群</li><li>GitHub Issues</li><li>ClawHub 技能市場</li></ul></div>
+                <div class="content-box"><h3>參與貢獻</h3><ul><li>提交技能到 ClawHub</li><li>回報問題與功能請求</li><li>翻譯與文檔</li><li>開發新功能</li></ul></div>
+            </div>
+            <div class="quote-box">「OpenClaw 讓每個人都能擁有屬於自己的 AI 助理」—— 開發團隊願景</div>
+            <div class="slide-number">10 / 12</div>
+        </div>
+        
+        <!-- Slide 11: Roadmap -->
+        <div class="slide">
+            <span class="section-header">發展藍圖</span>
+            <h2>未來規劃</h2>
+            <div class="content-grid">
+                <div class="content-box"><h3>短期目標 (0-3個月)</h3><ul><li>完善技能市場生態</li><li>增加更多 AI 模型支援</li><li>改進 MCP 整合</li><li>強化隱私安全</li></ul></div>
+                <div class="content-box"><h3>中期目標 (3-6個月)</h3><ul><li>多語言支援優化</li><li>行動應用程式</li><li>進階自動化工作流</li><li>企業版功能</li></ul></div>
+            </div>
+            <div class="content-box" style="margin-top:15px"><h3>長期願景 (6-12個月)</h3><ul><li>完全自主的 AI 代理系統</li><li>跨裝置無縫同步</li><li>企業級部署方案</li><li>全球化社群擴展</li></ul></div>
+            <div class="slide-number">11 / 12</div>
+        </div>
+        
+        <!-- Slide 12: Conclusion -->
+        <div class="slide conclusion">
+            <span class="section-header">結語</span>
+            <blockquote>OpenClaw — 讓 AI 助理真正成為你的數位延伸，跨越所有平台，服務於你的日常生活與工作效率。</blockquote>
+            <cite>— OpenClaw 團隊</cite>
+            <div class="product-tags" style="margin-top:35px">
+                <span class="product-tag">🤖 OpenClaw</span>
+                <span class="product-tag">⭐ Star us on GitHub</span>
+                <span class="product-tag">💬 Join Discord</span>
+            </div>
+            <div class="slide-number">12 / 12</div>
+        </div>
+    </div>
+    <div class="nav">
+        <button onclick="prevSlide()">◀ 上一頁</button>
+        <button onclick="nextSlide()">下一頁 ▶</button>
+    </div>
+    <script>
+        let currentSlide=0;
+        const slides=document.querySelectorAll('.slide');
+        const totalSlides=slides.length;
+        function showSlide(index){
+            slides.forEach(s=>s.classList.remove('active'));
+            slides[index].classList.add('active');
+            document.getElementById('progress').style.width=((index+1)/totalSlides*100)+'%';
+        }
+        function nextSlide(){currentSlide=(currentSlide+1)%totalSlides;showSlide(currentSlide);}
+        function prevSlide(){currentSlide=(currentSlide-1+totalSlides)%totalSlides;showSlide(currentSlide);}
+        document.addEventListener('keydown',(e)=>{if(e.key==='ArrowRight'||e.key===' ')nextSlide();if(e.key==='ArrowLeft')prevSlide();});
+        showSlide(0);
+    </script>
+</body>
+</html>
