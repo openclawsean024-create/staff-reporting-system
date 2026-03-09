@@ -383,7 +383,7 @@
         <div class="card" id="reportForm">
             <!-- Daily Sales Summary -->
             <div id="dailySales" style="display:none;background:linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);border-radius:12px;padding:15px;margin-bottom:15px;text-align:center;color:#fff;">
-                <div style="font-size:12px;opacity:0.9;">今日營業額 Daily Sales</div>
+                <div style="font-size:12px;opacity:0.9;">累積營業額 Cumulative Sales</div>
                 <div style="font-size:28px;font-weight:900;" id="totalSalesAmount">$0</div>
                 <div style="font-size:12px;opacity:0.8;" id="totalSalesCount">0筆成交</div>
             </div>
@@ -575,14 +575,10 @@
             const saved = localStorage.getItem('staffReport_user');
             if (saved) {
                 currentUser = JSON.parse(saved);
-                const loginDate = new Date(currentUser.loginTime).toDateString();
-                const today = new Date().toDateString();
-                
-                if (loginDate === today) {
-                    loadHistory();
-                    showMainForm();
-                    return;
-                }
+                // 保留登入資訊，顯示主要表單並載入歷史記錄
+                loadHistory();
+                showMainForm();
+                return;
             }
             
             document.getElementById('loginForm').style.display = 'block';
@@ -594,7 +590,7 @@
         function logout() {
             if (confirm('確定要登出嗎？')) {
                 localStorage.removeItem('staffReport_user');
-                localStorage.removeItem('staffReport_history');
+                // 保留銷售記錄，只移除用戶登入資訊
                 currentUser = null;
                 location.reload();
             }
