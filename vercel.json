@@ -16,6 +16,10 @@
       "dest": "/api/submit.js"
     },
     {
+      "src": "/pricing",
+      "dest": "/pricing.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
