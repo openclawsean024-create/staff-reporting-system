@@ -1027,15 +1027,10 @@
             const saved = localStorage.getItem('staffReport_history');
             if (saved) {
                 reportHistory = JSON.parse(saved);
-                
-                const today = new Date().toDateString();
-                const todayReports = reportHistory.filter(r => 
-                    new Date(r.date).toDateString() === today
-                );
-                
-                if (todayReports.length > 0) {
+
+                if (reportHistory.length > 0) {
                     let html = '';
-                    todayReports.forEach((r, index) => {
+                    reportHistory.forEach((r, index) => {
                         const time = new Date(r.date).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
                         html += `
                             <div class="history-item">

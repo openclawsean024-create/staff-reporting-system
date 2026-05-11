@@ -47,27 +47,24 @@ function doGet(e) {
     if (action === 'getAllReports') {
       var ss = SpreadsheetApp.openById(SHEET_ID);
       var sheet = ss.getSheetByName('回報');
-      var today = new Date().toISOString().split('T')[0];
       var total = 0, count = 0, list = [];
-      
+
       if (sheet) {
         var data = sheet.getDataRange().getValues();
         for (var i = 1; i < data.length; i++) {
           var time = String(data[i][1] || '');
-          if (time.includes(today)) {
-            var price = String(data[i][6] || '0').replace(/[^0-9.]/g, '');
-            if (price) { total += parseFloat(price) || 0; count++; }
-            list.push({
-              id: String(data[i][0] || ''),
-              time: time,
-              name: String(data[i][2] || ''),
-              store: String(data[i][3] || ''),
-              pn: String(data[i][4] || ''),
-              productName: String(data[i][5] || ''),
-              price: String(data[i][6] || ''),
-              note: String(data[i][7] || '')
-            });
-          }
+          var price = String(data[i][6] || '0').replace(/[^0-9.]/g, '');
+          if (price) { total += parseFloat(price) || 0; count++; }
+          list.push({
+            id: String(data[i][0] || ''),
+            time: time,
+            name: String(data[i][2] || ''),
+            store: String(data[i][3] || ''),
+            pn: String(data[i][4] || ''),
+            productName: String(data[i][5] || ''),
+            price: String(data[i][6] || ''),
+            note: String(data[i][7] || '')
+          });
         }
       }
       return ContentService.createTextOutput(JSON.stringify({total: total, count: count, reports: list})).setMimeType(ContentService.MimeType.JSON);
@@ -77,20 +74,18 @@ function doGet(e) {
     if (action === 'getUserReports') {
       var ss = SpreadsheetApp.openById(SHEET_ID);
       var sheet = ss.getSheetByName('回報');
-      var today = new Date().toISOString().split('T')[0];
       var userName = p.name || '';
       var userStore = p.store || '';
       var total = 0, count = 0, list = [];
-      
+
       if (sheet) {
         var data = sheet.getDataRange().getValues();
         for (var i = 1; i < data.length; i++) {
           var time = String(data[i][1] || '');
           var name = String(data[i][2] || '');
           var store = String(data[i][3] || '');
-          
-          // 只顯示今天的報告，並且是這個用戶的
-          if (time.includes(today) && name === userName && store === userStore) {
+
+          if (name === userName && store === userStore) {
             var price = String(data[i][6] || '0').replace(/[^0-9.]/g, '');
             if (price) { total += parseFloat(price) || 0; count++; }
             list.push({
