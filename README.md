@@ -22,3 +22,5 @@ Google Apps Script 員工報工系統。
 ├── archive/              # 歷史版本（不活躍）
 └── .gitignore
 ```
+
+<!-- Last validated: 2026-09-06 by OpenClaw Overnight Dev -->
