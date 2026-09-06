@@ -1,9 +1,137 @@
-# 駐點回報系統 — 規格計劃書 v2.2.1
+# 駐點回報系統 — 規格計劃書 v3.0.2（v2.2.1 產品層 + v3.0.2 基礎設施層）
 
-> 版本：v2.2.1｜更新日期：2026-07-19｜維護者：Sophia (CPO) for Sean
+> **本檔雙層結構**：
+> - **§A1–§A15 為既有 v2.2.1 產品規格層**（Sophia CPO 撰寫，2026-07-19 frozen）— 描述**做什麼、為誰做、商業邏輯、產品 FR/NFR**
+> - **§B1–§B9 為 v3.0.2 基礎設施規格層**（Sean 10-repo-fleet 補完，2026-09-06）— 描述**repo 怎麼被 build / test / lint / deploy**
+>
+> 版本：v3.0.2（infra layer）on v2.2.1（product layer）｜更新日期：2026-09-06｜維護者：Sean Li
 > 對接技術：Alan (CTO)｜GitHub：https://github.com/openclawsean024-create/staff-reporting-system
 > Live：https://staff-reporting-system.vercel.app
-> Sweet Spot 體檢：4/10（kill 但找出甜蜜點）→ 本版重寫為「**外勤 AI 打卡助理（LINE + Web 雙通道）+ 微型保全公司月報即時出**」
+> Sweet Spot 體檢：4/10（kill 但找出甜蜜點）→ v2.2.1 重寫為「**外勤 AI 打卡助理（LINE + Web 雙通道）+ 微型保全公司月報即時出**」
+
+---
+
+# §B. v3.0.2 基礎設施規格層（Sean 10-repo-fleet 補完）
+
+## §B1. Repo 概述
+本 repo 為 v1 版的「Google Apps Script 員工報工系統」前端 + Vercel API 收件端。**產品已封存**（Sophia 於 v2.2.1 §0 重寫為「LINE + Web 雙通道」新定位，參見 `staff-reporting-system-v2`），本 repo 保留為**歷史 frozen 部署**。
+
+### §B1.1 部署狀態
+- **Live**：https://staff-reporting-system.vercel.app（Vercel Hobby 免費層）
+- **GitHub Pages**：has_pages=true（GitHub Pages 設定存在，但實際以 Vercel 為主）
+- **Backend**：Google Apps Script Web App（接收 `GoogleAppsScript.js` POST）+ Vercel `/api/submit` 接收照片（multiparty + nodemailer + sharp HEIC→JPEG）
+- **Static files**：`index.html`（SPA entry）、`dashboard.html`（家服 dashboard）、`pricing.html`（3 方案定價）
+
+### §B1.2 程式碼結構
+```
+/
+├── GoogleAppsScript.js   # 5.2KB · Apps Script 主邏輯（產品核心已凍結）
+├── api/submit.js         # Vercel serverless function（HEIC→JPEG + nodemailer 寄信）
+├── index.html            # Vercel SPA entry
+├── dashboard.html        # 家服 dashboard
+├── pricing.html          # 3 方案定價頁
+├── vercel.json           # Vercel routing config
+├── package.json          # 多 party / nodemailer / sharp（API 依賴）
+├── archive/              # 17 個歷史版本（v3~v13 / final / fixed / simple / price / tz / admin 等，frozen）
+└── PRD/SPEC.md           # 本檔
+```
+
+## §B2. Definition of Done（v3.0.2）
+- [x] v2.2.1 產品規格保留完整（不可刪）
+- [x] GHA CI workflow（4 jobs: lint/test/build/deploy）
+- [x] CHANGELOG.md 記錄 v3.0.2 變更
+- [x] README 反映現況（已含部署 URL + 結構圖）
+- [x] `.gitignore` 補完（node_modules, .DS_Store, Thumbs.db, IDE, .vercel）
+
+## §B3. Functional Requirements（基礎設施層）
+| ID | 功能 | 優先級 | 狀態 |
+|---|---|---|---|
+| FR-INF-001 | GHA CI 4-job pipeline | P0 | ✅ shipped |
+| FR-INF-002 | Node.js 20 環境 | P0 | ✅ shipped |
+| FR-INF-003 | Vercel deploy 自動觸發 | P0 | ✅ shipped |
+| FR-INF-004 | API 端點 syntax 檢查 | P1 | ✅ shipped |
+| FR-INF-005 | CHANGELOG.md 維護 | P1 | ✅ shipped |
+| FR-INF-006 | Archive 歷史版本保留 | P1 | ✅ shipped |
+
+## §B4. Non-Functional Requirements（基礎設施層）
+| 維度 | 需求 |
+|---|---|
+| Performance | Vercel Edge cold start < 2s |
+| Security | API 環境變數管理（Vercel env，不入 git） |
+| Privacy | 無個資蒐集（Apps Script 後端） |
+| Accessibility | 既有 HTML 已用 Noto Sans TC + Tailwind |
+| Browser | Modern evergreen（CDN Tailwind） |
+| Cost | Vercel Hobby $0 + Google Apps Script Free Quota |
+
+## §B5. 技術架構
+```
+[瀏覽器]
+  ↓ HTML
+[Vercel CDN]
+  ↓ /api/submit (POST multipart)
+[Vercel Function]
+  ├── multiparty 解析
+  ├── sharp HEIC→JPEG
+  └── nodemailer → [Email/SMTP]
+  ↓
+[Google Apps Script Web App]  (via doGet/doPost in GoogleAppsScript.js)
+  ↓
+[Google Sheet]                (PRODUCTS_SHEET_NAME / REPORTS_SHEET_NAME)
+```
+
+### §B5.1 Module Map
+- `GoogleAppsScript.js` — Apps Script 主邏輯（frozen）
+- `api/submit.js` — Vercel serverless function（HEIC + Email）
+- `*.html` — Static UI（Tailwind CDN）
+- `archive/` — 17 個歷史 Apps Script 版本（不活躍，frozen）
+- `vercel.json` — Vercel routing
+- `.github/workflows/ci.yml` — GHA CI（v3.0.2 新增）
+
+### §B5.2 環境變數
+- 無 frontend env var
+- Backend（Vercel / Google Apps Script）：SMTP creds + Google Sheet ID（透過 Vercel env + Apps Script Properties，**不入 git**）
+
+### §B5.3 降級策略
+- Email 寄送失敗 → 保留照片於 `/tmp`，SMTP 失敗訊息回傳前端
+- HEIC→JPEG 失敗 → 退回原檔
+- Apps Script 失敗 → 仍可從 Vercel `/api/submit` 直接收件
+
+## §B6. Definition of Done（v3.0.2 補完確認）
+- [x] GHA `.github/workflows/ci.yml` 4 jobs 全綠
+- [x] `PRD/CHANGELOG.md` 記錄 v3.0.2 條目
+- [x] `.gitignore` 補完
+- [x] README 反映現況
+- [x] Repo push 至 main
+
+## §B7. 部署契約
+| 環境 | 目標 | 觸發 |
+|---|---|---|
+| Production | Vercel (Hobby) | push to main |
+| Pages | GitHub Pages（has_pages=true，已建但目前以 Vercel 為主） | push to main |
+
+### §B7.1 GHA Workflow
+- `.github/workflows/ci.yml`
+- jobs: **lint**（graceful fallback）/ **test**（vitest optional）/ **build**（語法檢查）/ **deploy**（none — Vercel 用 own webhook）
+- 說明：本 repo 為 static + serverless function，無 `npm run build`，deploy 由 Vercel GitHub App 自動接管
+
+### §B7.2 環境變數
+- 無需 GitHub Secrets
+- Vercel / Apps Script secrets 走各自平台
+
+## §B8. Out of Scope（v3.0.2 基礎設施層不做）
+- 不做新產品功能（v2.2.1 已 frozen）
+- 不重構 Apps Script 程式碼
+- 不刪除 archive/ 歷史版本
+- 不動 Google Sheet 結構
+
+## §B9. 變更日誌
+見 [`PRD/CHANGELOG.md`](CHANGELOG.md)
+
+---
+
+# §A. v2.2.1 產品規格層（frozen, 2026-07-19）
+
+> 以下為 v2.2.1 既有內容，由 Sophia (CPO) 撰寫，2026-07-19 frozen。v3.0.2 不修改 §A 任何內容。
 
 ---
 
